@@ -16,18 +16,6 @@ jobs:
       - name: Check out wrapper source
         uses: actions/checkout@v4
 
-      - name: Check server configuration is present
-        shell: bash
-        env:
-          SERVER_URL: ${{ secrets.SERVER_URL }}
-        run: |
-          set -euo pipefail
-          set +x
-          if [ -z "$SERVER_URL" ]; then
-            echo '::error::The SERVER_URL repository secret is missing.'
-            exit 1
-          fi
-
       - name: Test origin policy
         shell: bash
         run: |
@@ -39,7 +27,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 Tests/test_embed_server_url.py
           node Tests/test_web_behavior.js
 
       - name: Build unsigned iOS app
@@ -55,16 +42,6 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/dclegacy-build" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
             build
-
-      - name: Configure built app
-        shell: bash
-        env:
-          SERVER_URL: ${{ secrets.SERVER_URL }}
-        run: |
-          set -euo pipefail
-          set +x
-          python3 .github/scripts/embed_server_url.py \
-            "$RUNNER_TEMP/dclegacy-build/Build/Products/Release-iphoneos/DragonCityLegacy.app/Info.plist"
 
       - name: Package unsigned IPA
         shell: bash

@@ -5,6 +5,8 @@ import WebKit
 
 @MainActor
 final class WebViewModel: NSObject, ObservableObject {
+    private static let serverAddress = "http://132.145.159.218:8080"
+
     enum State {
         case loading
         case ready
@@ -24,8 +26,8 @@ final class WebViewModel: NSObject, ObservableObject {
     private var didStart = false
 
     override init() {
-        let configuredURL = (Bundle.main.object(forInfoDictionaryKey: "SERVER_URL") as? String)
-            .flatMap(URL.init(string:))
+        let plistAddress = Bundle.main.object(forInfoDictionaryKey: "SERVER_URL") as? String
+        let configuredURL = plistAddress == Self.serverAddress ? URL(string: Self.serverAddress) : nil
         let configuredOrigin = configuredURL.flatMap(ServerOrigin.init(url:))
         serverURL = configuredOrigin == nil ? nil : configuredURL
         origin = configuredOrigin
