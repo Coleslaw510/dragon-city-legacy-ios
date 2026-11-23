@@ -1,0 +1,12 @@
+# Local Xcode state and build products
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.ipa
+Payload/
+
+# Python cache
+__pycache__/
+*.pyc

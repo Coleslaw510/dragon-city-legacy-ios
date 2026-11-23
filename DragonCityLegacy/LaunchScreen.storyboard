@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DCL-VC-001">
+    <device id="retina6_12" orientation="landscape" appearance="dark"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <scene sceneID="DCL-SC-001">
+            <objects>
+                <viewController id="DCL-VC-001" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="DCL-VW-001">
+                        <rect key="frame" x="0.0" y="0.0" width="852" height="393"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Dragon City Legacy" textAlignment="center" adjustsFontSizeToFit="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DCL-LB-001">
+                                <rect key="frame" x="286" y="182" width="280" height="29"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="24"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="DCL-SA-001"/>
+                        <color key="backgroundColor" red="0.025" green="0.055" blue="0.075" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="DCL-LB-001" firstAttribute="centerX" secondItem="DCL-VW-001" secondAttribute="centerX" id="DCL-C1-001"/>
+                            <constraint firstItem="DCL-LB-001" firstAttribute="centerY" secondItem="DCL-VW-001" secondAttribute="centerY" id="DCL-C2-001"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DCL-FR-001" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>

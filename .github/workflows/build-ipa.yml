@@ -1,0 +1,92 @@
+name: Build iOS wrapper
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Check out wrapper source
+        uses: actions/checkout@v4
+
+      - name: Check server configuration is present
+        shell: bash
+        env:
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+        run: |
+          set -euo pipefail
+          set +x
+          if [ -z "$SERVER_URL" ]; then
+            echo '::error::The SERVER_URL repository secret is missing.'
+            exit 1
+          fi
+
+      - name: Test origin policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          swiftc DragonCityLegacy/ServerOrigin.swift Tests/main.swift -o "$RUNNER_TEMP/origin-tests"
+          "$RUNNER_TEMP/origin-tests"
+
+      - name: Test wrapper helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 Tests/test_embed_server_url.py
+          node Tests/test_web_behavior.js
+
+      - name: Build unsigned iOS app
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -quiet \
+            -project DragonCityLegacy.xcodeproj \
+            -scheme DragonCityLegacy \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/dclegacy-build" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            build
+
+      - name: Configure built app
+        shell: bash
+        env:
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+        run: |
+          set -euo pipefail
+          set +x
+          python3 .github/scripts/embed_server_url.py \
+            "$RUNNER_TEMP/dclegacy-build/Build/Products/Release-iphoneos/DragonCityLegacy.app/Info.plist"
+
+      - name: Package unsigned IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/dclegacy-build/Build/Products/Release-iphoneos/DragonCityLegacy.app"
+          PACKAGE="$RUNNER_TEMP/dclegacy-package"
+          OUTPUT="$RUNNER_TEMP/dclegacy-output"
+          mkdir -p "$PACKAGE/Payload" "$OUTPUT"
+          ditto "$APP" "$PACKAGE/Payload/DragonCityLegacy.app"
+          ditto -c -k --sequesterRsrc --keepParent "$PACKAGE/Payload" "$OUTPUT/DragonCityLegacy.ipa"
+
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: DragonCityLegacy-unsigned-ipa
+          path: ${{ runner.temp }}/dclegacy-output/DragonCityLegacy.ipa
+          if-no-files-found: error
+
+      - name: Attach IPA to tag release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ runner.temp }}/dclegacy-output/DragonCityLegacy.ipa
+          fail_on_unmatched_files: true
